@@ -7,6 +7,8 @@ wheels/
 *.egg-info
 .idea/
 .DS_Store
+.agents
+.github
 # Virtual environments
 .venv
 backend/.env
