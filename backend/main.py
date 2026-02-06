@@ -18,7 +18,7 @@ load_dotenv()
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if not DATABASE_URL:
-    raise RuntimeError("Missing DATABASE_URL environment variable")
+    raise RuntimeError("Dodaj klucz DATABASE_URL do pliku .env!")
 
 engine = create_engine(
     DATABASE_URL,
@@ -146,6 +146,7 @@ def get_user_profile_stats(db: Session, user_id: str):
         return None
 
     return float(result[0]), float(result[1]), query.count()
+
 @api.get("/")
 def hello_world():
     return {
@@ -157,35 +158,6 @@ def hello_world():
 
 @api.post("/sessions", response_model=SessionOut)
 def create_training_session(payload: SessionCreate, db: Session = Depends(get_db)):
-    """
-  TRAINING ENDPOINT - Enroll a new typing session
-
-  This endpoint is called during the training phase when users type the
-  fixed training text. It implements anti-poisoning protection to prevent
-  profile corruption.
-
-  Process Flow:
-  1. Calculate biometric stats for current session
-  2. Fetch user's historical profile (if exists)
-  3. Check for consistency (anti-poisoning)
-  4. Save to database if validation passes
-  5. Return session details
-
-  Anti-Poisoning Logic:
-  - Compares current session against established baseline
-  - Rejects sessions that deviate by more than MAX_DEVIATION (40ms)
-  - Prevents impostor attacks and accidental profile corruption
-
-  Args:
-      payload: Session data from frontend (userId, text, keystrokes)
-      db: Database session (injected)
-
-  Returns:
-      SessionOut with session details
-
-  Raises:
-      HTTPException 400: If typing pattern is inconsistent with profile
-  """
     cur_dwell, cur_flight = calculate_session_stats(payload.keystrokes)
     history = get_user_profile_stats(db, payload.userId)
     if history:
@@ -266,23 +238,23 @@ def verify_user(payload: SessionCreate, db: Session = Depends(get_db)):
 
     results = []
 
-    for u_id, u_dwell, u_flight in user_stats:
-        if u_dwell is None or u_flight is None:
+    for user_id, user_dwell, user_flight in user_stats:
+        if user_dwell is None or user_flight is None:
             continue
         #Manhatann
-        dist = abs(decimal.Decimal(in_dwell) - u_dwell) + abs(decimal.Decimal(in_flight) - u_flight)
+        dist = abs(decimal.Decimal(in_dwell) - user_dwell) + abs(decimal.Decimal(in_flight) - user_flight)
 
         confidence = max(0, 100 - dist)
 
         results.append({
-            "userId": u_id,
+            "userId": user_id,
             "score": round(dist, 2),
             "confidence": round(confidence, 1),
-            "isMatch": u_id == payload.userId
+            "isMatch": user_id == payload.userId
         })
 
     results.sort(key=lambda x: x["score"])
-    top_matches = results[:5] #TODO: niezbyt optymalne lepiej ograniczyć querry zamiast filtrowac na endpointcie
+    top_matches = results[:5] #TODO: niezbyt optymalne lepiej ograniczyć query zamiast filtrowac na endpointcie
 
     matrix = [
         VerificationMatch(
@@ -311,7 +283,7 @@ def verify_user(payload: SessionCreate, db: Session = Depends(get_db)):
 
 app.include_router(api)
 
-#TODO: Kilka metod sprawdzających i trenujących, potencjalnie model SVC, potrzeba by przeksztalcic dane
+#TODO: Kilka dodatkowych metod sprawdzających i trenujących poza Manhatanem, potencjalnie model SVC, potrzeba by przeksztalcic dane
 
 if __name__ == "__main__":
     import uvicorn

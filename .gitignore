@@ -9,6 +9,8 @@ wheels/
 .DS_Store
 .agents
 .github
+# Zmienne środowiskowe (np. DATABASE_URL dla Neon) – nie commituj
+.env
 # Virtual environments
 .venv
 backend/.env

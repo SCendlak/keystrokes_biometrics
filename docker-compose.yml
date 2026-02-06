@@ -15,7 +15,9 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://keystrokes:keystrokes@db:5432/keystrokes
+      # Ustaw DATABASE_URL w pliku .env (w katalogu projektu), żeby użyć Neon
+      # lub innej zewnętrznej bazy. Bez .env używana jest lokalna baza (db).
+      DATABASE_URL: ${DATABASE_URL:-postgresql://keystrokes:keystrokes@db:5432/keystrokes}
     depends_on:
       - db
 

@@ -74,6 +74,16 @@ docker compose up --build -d
 
 Następnie otwórz w przeglądarce: **[http://localhost:5173](http://localhost:5173)**.
 
+### Baza Neon (lub inna zewnętrzna PostgreSQL)
+
+Zamiast lokalnego kontenera `db` możesz podłączyć backend do bazy Neon (lub innej hostowanej PostgreSQL). W katalogu głównym projektu utwórz plik **`.env`** (jest w `.gitignore`) i ustaw w nim adres bazy:
+
+```bash
+DATABASE_URL=postgresql://użytkownik:hasło@host/baza?sslmode=require
+```
+
+Następnie uruchom jak zwykle: `./run.sh` lub `docker compose up --build -d`. Backend odczyta `DATABASE_URL` z `.env` i połączy się z Neon; kontener `db` nadal się uruchomi (można go pominąć: `docker compose up --build -d backend frontend`), ale backend nie będzie z niego korzystał.
+
 ### Zatrzymanie
 
 W katalogu projektu:

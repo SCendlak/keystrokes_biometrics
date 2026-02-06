@@ -249,7 +249,7 @@ function App() {
     return (
       <div className="container" style={{ textAlign: "center", marginTop: 50 }}>
         <h1>Keystroke Biometrics</h1>
-        <div style={{ display: "flex", flexDirection: "column", gap: 15, maxWidth: 300, margin: "0 auto" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 15, margin: "0 auto" }}>
           <input
             type="text"
             placeholder="Enter Username"
@@ -257,13 +257,14 @@ function App() {
             onChange={(e) => setUsername(e.target.value)}
             style={{ padding: 12, fontSize: 16, borderRadius: 4, border: "1px solid #444", background: "#222", color: "white" }}
           />
-          <button
+          <div style={{display: "flex", flexDirection: "row", gap:15}}>
+            <button
             disabled={!username}
             onClick={() => setView("train")}
             className="btn-primary"
             style={{ backgroundColor: "#4ade80", color: "black" }}
           >
-            TRAIN (Enrollment)
+            Trenuj (wstępne 3 próby)
           </button>
           <button
             disabled={!username}
@@ -271,8 +272,11 @@ function App() {
             className="btn-primary"
             style={{ backgroundColor: "#60a5fa", color: "black" }}
           >
-            TEST (Verification)
+            Testuj (Zweryfikuj na podstawie gotowych danych)
           </button>
+          </div>
+
+
         </div>
       </div>
     );
